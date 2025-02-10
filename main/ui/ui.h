@@ -22,15 +22,16 @@ extern lv_obj_t * ui_Image1;
 extern lv_obj_t * ui_Image2;
 extern lv_obj_t * ui_Image3;
 extern lv_obj_t * ui_Image4;
+
 // CUSTOM VARIABLES
 
 // EVENTS
 extern lv_obj_t * ui____initial_actions0;
 
 // IMAGES AND IMAGE SETS
-LV_IMG_DECLARE(ui_img_img_0266_png);    // assets/IMG_0266.png
-LV_IMG_DECLARE(ui_img_img_0639_png);    // assets/IMG_0639.png
-LV_IMG_DECLARE(ui_img_img_1558_png);    // assets/IMG_1558.png
+LV_IMG_DECLARE(ui_img_2_png);    // assets/2.png
+LV_IMG_DECLARE(ui_img_1_png);    // assets/1.png
+LV_IMG_DECLARE(ui_img_3_png);    // assets/3.png
 
 // UI INIT
 void ui_init(void);

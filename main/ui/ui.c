@@ -13,16 +13,16 @@
 void ui_Screen1_screen_init(void);
 lv_obj_t * ui_Screen1;
 lv_obj_t * ui_Image1;
-lv_obj_t * ui_Image2;
-lv_obj_t * ui_Image3;
-lv_obj_t * ui_Image4;
+lv_obj_t * ui_Image2; 
+lv_obj_t * ui_Image3; 
+lv_obj_t * ui_Image4; 
 // CUSTOM VARIABLES
 
 // EVENTS
 lv_obj_t * ui____initial_actions0;
 
 // IMAGES AND IMAGE SETS
-const lv_img_dsc_t * ui_imgset_img_[3] = {&ui_img_img_0266_png, &ui_img_img_0639_png, &ui_img_img_1558_png};
+const lv_img_dsc_t * ui_imgset_[3] = {&ui_img_1_png, &ui_img_2_png, &ui_img_3_png};
 
 ///////////////////// TEST LVGL SETTINGS ////////////////////
 #if LV_COLOR_DEPTH != 16

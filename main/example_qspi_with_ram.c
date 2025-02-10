@@ -267,15 +267,15 @@ static void image_switch_task(void *pvParameters) {
             switch (current_image) {
                 case 0:
                     lv_obj_clear_flag(ui_Image2, LV_OBJ_FLAG_HIDDEN);
-                    lv_img_set_src(ui_Image2, &ui_img_img_0266_png);
+                    lv_img_set_src(ui_Image2, &ui_img_1_png);
                     break;
                 case 1:
                     lv_obj_clear_flag(ui_Image3, LV_OBJ_FLAG_HIDDEN);
-                    lv_img_set_src(ui_Image3, &ui_img_img_0639_png);
+                    lv_img_set_src(ui_Image3, &ui_img_2_png);
                     break;
                 case 2:
                     lv_obj_clear_flag(ui_Image4, LV_OBJ_FLAG_HIDDEN);
-                    lv_img_set_src(ui_Image4, &ui_img_img_1558_png);
+                    lv_img_set_src(ui_Image4, &ui_img_3_png);
                     break;
             }
             

@@ -29,6 +29,7 @@
 #include "esp_lcd_panel_ops.h"
 #include "esp_err.h"
 #include "esp_log.h"
+#include "esp_heap_caps.h"
 
 #include "lvgl.h"
 #include "lv_demos.h"
@@ -38,6 +39,34 @@
 
 // Add this after the includes
 void ui_Screen1_screen_init(void);
+
+// Declare PSRAM image buffers
+static lv_img_dsc_t* psram_img_1;
+static lv_img_dsc_t* psram_img_2;
+static lv_img_dsc_t* psram_img_3;
+
+// Function to allocate and copy image to PSRAM
+static lv_img_dsc_t* copy_img_to_psram(const lv_img_dsc_t* src) {
+    size_t total_size = sizeof(lv_img_dsc_t) + src->data_size;
+    
+    // Allocate memory in PSRAM
+    lv_img_dsc_t* psram_img = (lv_img_dsc_t*)heap_caps_malloc(total_size, MALLOC_CAP_SPIRAM);
+    if (psram_img == NULL) {
+        return NULL;
+    }
+
+    // Copy the image descriptor
+    memcpy(psram_img, src, sizeof(lv_img_dsc_t));
+    
+    // Copy image data right after the descriptor
+    uint8_t* data_ptr = (uint8_t*)(psram_img + 1);
+    memcpy(data_ptr, src->data, src->data_size);
+    
+    // Update the data pointer to point to the copied data
+    psram_img->data = data_ptr;
+    
+    return psram_img;
+}
 
 static const char *TAG = "example";
 static SemaphoreHandle_t lvgl_mux = NULL;
@@ -256,7 +285,7 @@ static void image_switch_task(void *pvParameters) {
     
     while (1) {
         if (example_lvgl_lock(-1)) {
-            current_image = (current_image + 1) % 3;
+            current_image = (current_image + 1) % 5;
             
             // Hide all images first
             lv_obj_add_flag(ui_Image2, LV_OBJ_FLAG_HIDDEN);
@@ -267,23 +296,24 @@ static void image_switch_task(void *pvParameters) {
             switch (current_image) {
                 case 0:
                     lv_obj_clear_flag(ui_Image2, LV_OBJ_FLAG_HIDDEN);
-                    lv_img_set_src(ui_Image2, &ui_img_1_png);
+                    lv_img_set_src(ui_Image2, psram_img_1);
                     break;
                 case 1:
                     lv_obj_clear_flag(ui_Image3, LV_OBJ_FLAG_HIDDEN);
-                    lv_img_set_src(ui_Image3, &ui_img_2_png);
+                    lv_img_set_src(ui_Image3, psram_img_2);
                     break;
                 case 2:
                     lv_obj_clear_flag(ui_Image4, LV_OBJ_FLAG_HIDDEN);
-                    lv_img_set_src(ui_Image4, &ui_img_3_png);
+                    lv_img_set_src(ui_Image4, psram_img_3);
                     break;
             }
             
             example_lvgl_unlock();
         }
-        vTaskDelay(pdMS_TO_TICKS(5000)); // 5 second delay
+        vTaskDelay(pdMS_TO_TICKS(500));
     }
 }
+
 
 void app_main(void)
 {
@@ -439,6 +469,15 @@ void app_main(void)
     ESP_LOGI(TAG, "Display LVGL demos");
     // Lock the mutex due to the LVGL APIs are not thread-safe
     if (example_lvgl_lock(-1)) {
+        // Copy images to PSRAM
+        psram_img_1 = copy_img_to_psram(&ui_img_1_png);
+        psram_img_2 = copy_img_to_psram(&ui_img_2_png);
+        psram_img_3 = copy_img_to_psram(&ui_img_3_png);
+
+        if (!psram_img_1 || !psram_img_2 || !psram_img_3) {
+            return;
+        }
+
         // Call the screen initialization function
         ui_init();
         xTaskCreate(image_switch_task,

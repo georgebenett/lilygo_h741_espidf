@@ -1,7 +1,7 @@
 {
     "version":            "1.1",
     "project_name":       "example_qspi_with_ram",
-    "project_version":    "1",
+    "project_version":    "fa15a7d-dirty",
     "project_path":       "/home/george/Documents/myrepo/lilygo_H741_esp-idf",
     "idf_path":           "/home/george/esp/v5.3.1/esp-idf",
     "build_dir":          "/home/george/Documents/myrepo/lilygo_H741_esp-idf/build",
@@ -1255,8 +1255,8 @@
             "managed_reqs": [ "esp_lcd_sh8601", "espressif__esp_lcd_touch_ft5x06", "lvgl__lvgl" ],
             "managed_priv_reqs": [],
             "file": "/home/george/Documents/myrepo/lilygo_H741_esp-idf/build/esp-idf/main/libmain.a",
-            "sources": [ "/home/george/Documents/myrepo/lilygo_H741_esp-idf/main/example_qspi_with_ram.c" ],
-            "include_dirs": [ "." ]
+            "sources": [ "/home/george/Documents/myrepo/lilygo_H741_esp-idf/main/example_qspi_with_ram.c", "/home/george/Documents/myrepo/lilygo_H741_esp-idf/main/ui/components/ui_comp_hook.c", "/home/george/Documents/myrepo/lilygo_H741_esp-idf/main/ui/images/ui_img_img_0266_png.c", "/home/george/Documents/myrepo/lilygo_H741_esp-idf/main/ui/images/ui_img_img_0332_png.c", "/home/george/Documents/myrepo/lilygo_H741_esp-idf/main/ui/images/ui_img_img_0639_png.c", "/home/george/Documents/myrepo/lilygo_H741_esp-idf/main/ui/images/ui_img_img_1558_png.c", "/home/george/Documents/myrepo/lilygo_H741_esp-idf/main/ui/screens/ui_Screen1.c", "/home/george/Documents/myrepo/lilygo_H741_esp-idf/main/ui/ui.c", "/home/george/Documents/myrepo/lilygo_H741_esp-idf/main/ui/ui_helpers.c" ],
+            "include_dirs": [ ".", "ui" ]
         },
         "mbedtls": {
             "alias": "idf::mbedtls",
@@ -2881,7 +2881,7 @@
             "priv_reqs": [],
             "managed_reqs": [ "esp_lcd_sh8601", "espressif__esp_lcd_touch_ft5x06", "lvgl__lvgl" ],
             "managed_priv_reqs": [],
-            "include_dirs": [ "." ]
+            "include_dirs": [ ".", "ui" ]
         },
         "esp_lcd_sh8601": {
             "alias": "idf::esp_lcd_sh8601",

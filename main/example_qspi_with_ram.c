@@ -47,34 +47,6 @@
 // Add this after the includes
 void ui_Screen1_screen_init(void);
 
-// Declare PSRAM image buffers
-static lv_img_dsc_t* psram_img_1;
-static lv_img_dsc_t* psram_img_2;
-static lv_img_dsc_t* psram_img_3;
-
-// Function to allocate and copy image to PSRAM
-static lv_img_dsc_t* copy_img_to_psram(const lv_img_dsc_t* src) {
-    size_t total_size = sizeof(lv_img_dsc_t) + src->data_size;
-    
-    // Allocate memory in PSRAM
-    lv_img_dsc_t* psram_img = (lv_img_dsc_t*)heap_caps_malloc(total_size, MALLOC_CAP_SPIRAM);
-    if (psram_img == NULL) {
-        return NULL;
-    }
-
-    // Copy the image descriptor
-    memcpy(psram_img, src, sizeof(lv_img_dsc_t));
-    
-    // Copy image data right after the descriptor
-    uint8_t* data_ptr = (uint8_t*)(psram_img + 1);
-    memcpy(data_ptr, src->data, src->data_size);
-    
-    // Update the data pointer to point to the copied data
-    psram_img->data = data_ptr;
-    
-    return psram_img;
-}
-
 static const char *TAG = "example";
 static SemaphoreHandle_t lvgl_mux = NULL;
 
@@ -289,32 +261,10 @@ static void example_lvgl_port_task(void *arg)
 }
 
 static void image_switch_task(void *pvParameters) {
-    uint8_t current_image = 0;
+
     
     while (1) {
         if (example_lvgl_lock(-1)) {
-            current_image = (current_image + 1) % 5;
-            
-            // Hide all images first
-            lv_obj_add_flag(ui_Image2, LV_OBJ_FLAG_HIDDEN);
-            lv_obj_add_flag(ui_Image3, LV_OBJ_FLAG_HIDDEN);
-            lv_obj_add_flag(ui_Image4, LV_OBJ_FLAG_HIDDEN);
-            
-            // Show only the current image
-            switch (current_image) {
-                case 0:
-                    lv_obj_clear_flag(ui_Image2, LV_OBJ_FLAG_HIDDEN);
-                    lv_img_set_src(ui_Image2, psram_img_1);
-                    break;
-                case 1:
-                    lv_obj_clear_flag(ui_Image3, LV_OBJ_FLAG_HIDDEN);
-                    lv_img_set_src(ui_Image3, psram_img_2);
-                    break;
-                case 2:
-                    lv_obj_clear_flag(ui_Image4, LV_OBJ_FLAG_HIDDEN);
-                    lv_img_set_src(ui_Image4, psram_img_3);
-                    break;
-            }
             
             example_lvgl_unlock();
         }
@@ -531,14 +481,6 @@ void app_main(void)
     ESP_LOGI(TAG, "Display LVGL demos");
     // Lock the mutex due to the LVGL APIs are not thread-safe
     if (example_lvgl_lock(-1)) {
-        // Copy images to PSRAM
-        psram_img_1 = copy_img_to_psram(&ui_img_1_png);
-        psram_img_2 = copy_img_to_psram(&ui_img_2_png);
-        psram_img_3 = copy_img_to_psram(&ui_img_3_png);
-
-        if (!psram_img_1 || !psram_img_2 || !psram_img_3) {
-            return;
-        }
 
         // Call the screen initialization function
         ui_init();
@@ -558,11 +500,3 @@ void app_main(void)
         ESP_LOGE(TAG, "SD Card initialization failed");
     }
 }
-
-/* 1.43 inch AMOLED from DWO LIMITED
- * Part number: DO0143FMST02-QSPI  / DO0143PFST03-QSPI  / DO0143FMST05-QSPI  / DO0143FMST06-QSPI
- * Size: 1.43 inch
- * Resolution: 466x466
- * Signal interface:  QSPI
- * For more product information, please visit www.dwo.net.cn
- */

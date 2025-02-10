@@ -10,42 +10,5 @@ void ui_Screen1_screen_init(void)
     ui_Screen1 = lv_obj_create(NULL);
     lv_obj_clear_flag(ui_Screen1, LV_OBJ_FLAG_SCROLLABLE);      /// Flags
 
-    // Create Image1 (base image)
-    ui_Image1 = lv_img_create(ui_Screen1);
-    lv_img_set_src(ui_Image1, &ui_img_1_png);
-    lv_obj_set_width(ui_Image1, LV_SIZE_CONTENT);   /// 466
-    lv_obj_set_height(ui_Image1, LV_SIZE_CONTENT);    /// 466
-    lv_obj_set_align(ui_Image1, LV_ALIGN_CENTER);
-    lv_obj_add_flag(ui_Image1, LV_OBJ_FLAG_ADV_HITTEST);     /// Flags
-    lv_obj_clear_flag(ui_Image1, LV_OBJ_FLAG_SCROLLABLE);      /// Flags
 
-    // Create Image2
-    ui_Image2 = lv_img_create(ui_Screen1);
-    lv_img_set_src(ui_Image2, &ui_img_1_png);
-    lv_obj_set_width(ui_Image2, LV_SIZE_CONTENT);
-    lv_obj_set_height(ui_Image2, LV_SIZE_CONTENT);
-    lv_obj_set_align(ui_Image2, LV_ALIGN_CENTER);
-    lv_obj_add_flag(ui_Image2, LV_OBJ_FLAG_ADV_HITTEST);
-    lv_obj_clear_flag(ui_Image2, LV_OBJ_FLAG_SCROLLABLE);
-    lv_obj_add_flag(ui_Image2, LV_OBJ_FLAG_HIDDEN);
-
-    // Create Image3
-    ui_Image3 = lv_img_create(ui_Screen1);
-    lv_img_set_src(ui_Image3, &ui_img_2_png);
-    lv_obj_set_width(ui_Image3, LV_SIZE_CONTENT);
-    lv_obj_set_height(ui_Image3, LV_SIZE_CONTENT);
-    lv_obj_set_align(ui_Image3, LV_ALIGN_CENTER);
-    lv_obj_add_flag(ui_Image3, LV_OBJ_FLAG_ADV_HITTEST);
-    lv_obj_clear_flag(ui_Image3, LV_OBJ_FLAG_SCROLLABLE);
-    lv_obj_add_flag(ui_Image3, LV_OBJ_FLAG_HIDDEN);
-
-    // Create Image4
-    ui_Image4 = lv_img_create(ui_Screen1);
-    lv_img_set_src(ui_Image4, &ui_img_3_png);
-    lv_obj_set_width(ui_Image4, LV_SIZE_CONTENT);
-    lv_obj_set_height(ui_Image4, LV_SIZE_CONTENT);
-    lv_obj_set_align(ui_Image4, LV_ALIGN_CENTER);
-    lv_obj_add_flag(ui_Image4, LV_OBJ_FLAG_ADV_HITTEST);
-    lv_obj_clear_flag(ui_Image4, LV_OBJ_FLAG_SCROLLABLE);
-    lv_obj_add_flag(ui_Image4, LV_OBJ_FLAG_HIDDEN);
 }

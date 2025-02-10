@@ -28,10 +28,7 @@ extern lv_obj_t * ui_Image4;
 // EVENTS
 extern lv_obj_t * ui____initial_actions0;
 
-// IMAGES AND IMAGE SETS
-LV_IMG_DECLARE(ui_img_2_png);    // assets/2.png
-LV_IMG_DECLARE(ui_img_1_png);    // assets/1.png
-LV_IMG_DECLARE(ui_img_3_png);    // assets/3.png
+
 
 // UI INIT
 void ui_init(void);

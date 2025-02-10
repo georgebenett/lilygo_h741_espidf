@@ -1,4 +1,3 @@
-
 file(GLOB_RECURSE UI_SOURCES
     "${CMAKE_CURRENT_SOURCE_DIR}/ui/*.c"
 )
@@ -7,7 +6,9 @@ idf_component_register(
     SRCS "example_qspi_with_ram.c"
     ${UI_SOURCES}
     INCLUDE_DIRS "."
-    "ui")
+    "ui"
+    REQUIRES lvgl "lv_lib_png" fatfs 
+)
 
 set_source_files_properties(
     ${LV_DEMOS_SOURCES}

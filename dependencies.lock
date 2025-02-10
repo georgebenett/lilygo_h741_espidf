@@ -27,6 +27,20 @@ dependencies:
       path: /home/george/Documents/myrepo/lilygo_H741_esp-idf/components/espressif__esp_lcd_touch_ft5x06
       type: local
     version: 1.0.6
+  espressif/esp_lvgl_port:
+    component_hash: b43dc04720d126cbfe14d53a84787e4c24b7bd7f15468e224c930ad3ffb32258
+    dependencies:
+    - name: idf
+      require: private
+      version: '>=4.4'
+    - name: lvgl/lvgl
+      registry_url: https://components.espressif.com
+      require: public
+      version: ^8
+    source:
+      registry_url: https://components.espressif.com/
+      type: service
+    version: 1.4.0
   idf:
     source:
       type: idf
@@ -42,8 +56,9 @@ direct_dependencies:
 - espressif/esp_lcd_sh8601
 - espressif/esp_lcd_touch
 - espressif/esp_lcd_touch_ft5x06
+- espressif/esp_lvgl_port
 - idf
 - lvgl/lvgl
-manifest_hash: a57a21ffd327169a782f212b6acacb0a1dd091f04b432163933bb43560a8754e
+manifest_hash: 2466a1611ae2055077d5207038b5d7b092e9a3ea2b3e48bfd972cfe6f0d79323
 target: esp32s3
 version: 2.0.0

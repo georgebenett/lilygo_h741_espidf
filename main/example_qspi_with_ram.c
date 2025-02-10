@@ -45,6 +45,8 @@
 #include "esp_vfs_fat.h"
 #include "sdmmc_cmd.h"
 
+#include "lv_png.h"
+
 // Add this after the includes
 void ui_Screen1_screen_init(void);
 
@@ -262,14 +264,36 @@ static void example_lvgl_port_task(void *arg)
 }
 
 static void image_switch_task(void *pvParameters) {
+    int current_image = 1;
+    lv_obj_t *img = NULL;
+    char path[32];
 
-    
     while (1) {
         if (example_lvgl_lock(-1)) {
+            // Delete previous image if it exists
+            if (img != NULL) {
+                lv_obj_del(img);
+            }
+
+            // Create path string for current image
+            snprintf(path, sizeof(path), "/sdcard/%d.png", current_image);
+
+            // Create an image object
+            img = lv_img_create(lv_scr_act());
             
+            // Set the image source
+            lv_img_set_src(img, path);
+            
+            // Center the image
+            lv_obj_center(img);
+
+            // Move to next image, loop back to 1 if we reach 30
+            current_image = (current_image % 30) + 1;
+
             example_lvgl_unlock();
         }
-        vTaskDelay(pdMS_TO_TICKS(500));
+        // Wait for 2 seconds before showing next image
+        vTaskDelay(pdMS_TO_TICKS(2000));
     }
 }
 
@@ -448,6 +472,7 @@ void app_main(void)
 
     ESP_LOGI(TAG, "Initialize LVGL library");
     lv_init();
+    lv_png_init();
     // alloc draw buffers used by LVGL
     // it's recommended to choose the size of the draw buffer(s) to be at least 1/10 screen sized
     lv_color_t *buf1 = heap_caps_malloc(EXAMPLE_LCD_H_RES * EXAMPLE_LVGL_BUF_HEIGHT * sizeof(lv_color_t), MALLOC_CAP_DMA);

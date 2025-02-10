@@ -17,6 +17,7 @@
  */
 
 #include <stdio.h>
+#include <dirent.h>
 
 #include "freertos/FreeRTOS.h"
 #include "freertos/task.h"
@@ -324,6 +325,19 @@ static esp_err_t init_sd_card(void)
     sdmmc_card_print_info(stdout, card);
     ESP_LOGI(TAG, "SD card mounted successfully");
 
+    // List contents of the root directory
+    DIR *dir = opendir("/sdcard");
+    if (dir == NULL) {
+        ESP_LOGE(TAG, "Failed to open directory");
+        return ESP_FAIL;
+    }
+
+    struct dirent *ent;
+    while ((ent = readdir(dir)) != NULL) {
+        ESP_LOGI(TAG, "Found file: %s", ent->d_name);
+    }
+
+    closedir(dir);
     return ESP_OK;
 }
 

@@ -62,8 +62,7 @@ static bool button_pressed = false;
 #define RESET_DEBOUNCE_TIME_MS 2000
 #define INACTIVITY_TIMEOUT_MS (1000 * 60 * 5)  // 5 minutes
 
-// Forward declarations
-static void set_sleep_progress(void * obj, int32_t v);
+
 static void enter_deep_sleep(void);
 
 #define LCD_HOST    SPI2_HOST
@@ -281,32 +280,55 @@ static void image_switch_task(void *pvParameters) {
     lv_obj_t *img = NULL;
     char path[32];
 
+    // Show first image immediately
+    if (example_lvgl_lock(-1)) {
+        snprintf(path, sizeof(path), "/sdcard/%d.png", current_image);
+        img = lv_img_create(lv_scr_act());
+        lv_img_set_src(img, path);
+        lv_obj_center(img);
+        example_lvgl_unlock();
+    }
+
+    // Wait a moment to ensure first image is displayed
+    vTaskDelay(pdMS_TO_TICKS(500));
+
+    current_image = 2;  // Start from second image in the loop
+
     while (1) {
         if (example_lvgl_lock(-1)) {
-            // Delete previous image if it exists
-            if (img != NULL) {
-                lv_obj_del(img);
-            }
-
-            // Create path string for current image
+            // Create path string for next image
             snprintf(path, sizeof(path), "/sdcard/%d.png", current_image);
 
-            // Create an image object
-            img = lv_img_create(lv_scr_act());
+            // Check if file exists
+            FILE *f = fopen(path, "r");
+            if (f != NULL) {
+                fclose(f);
 
-            // Set the image source
-            lv_img_set_src(img, path);
+                // Delete previous image if it exists
+                if (img != NULL) {
+                    lv_obj_del(img);
+                }
 
-            // Center the image
-            lv_obj_center(img);
+                // Create an image object
+                img = lv_img_create(lv_scr_act());
 
-            // Move to next image, loop back to 1 if we reach 30
-            current_image = (current_image % 30) + 1;
+                // Set the image source
+                lv_img_set_src(img, path);
+
+                // Center the image
+                lv_obj_center(img);
+
+                // Move to next image
+                current_image++;
+            } else {
+                // File doesn't exist, reset to first image
+                current_image = 1;
+            }
 
             example_lvgl_unlock();
         }
-        // Wait for 2 seconds before showing next image
-        vTaskDelay(pdMS_TO_TICKS(2000));
+        // Wait for 10 seconds before showing next image
+        vTaskDelay(pdMS_TO_TICKS(10000));
     }
 }
 
@@ -438,29 +460,6 @@ static void button_check_task(void *pvParameters)
     }
 }
 
-static void set_sleep_progress(void * obj, int32_t v)
-{
-    lv_bar_set_value(obj, v, LV_ANIM_OFF);
-
-    // If we reach 100%, trigger sleep immediately
-    if (v >= 100) {
-        ESP_LOGI(TAG, "Sleep animation complete, entering deep sleep");
-
-        // Clean up before sleep
-        if (tp != NULL) {
-            esp_lcd_touch_enter_sleep(tp);
-        }
-
-        // Turn off LCD
-        gpio_set_level(EXAMPLE_PIN_NUM_LCD_EN, 0);
-
-        // Configure wake-up source
-        esp_sleep_enable_ext0_wakeup(GPIO_NUM_0, 0);
-
-        // Enter deep sleep
-        esp_deep_sleep_start();
-    }
-}
 
 
 void app_main(void)
@@ -616,6 +615,7 @@ void app_main(void)
     disp_drv.drv_update_cb = example_lvgl_update_cb;
     disp_drv.draw_buf = &disp_buf;
     disp_drv.user_data = panel_handle;
+    disp_drv.full_refresh = 1;
     lv_disp_t *disp = lv_disp_drv_register(&disp_drv);
 
     ESP_LOGI(TAG, "Install LVGL tick timer");
@@ -662,5 +662,14 @@ void app_main(void)
     esp_err_t ret = init_sd_card();
     if (ret != ESP_OK) {
         ESP_LOGE(TAG, "SD Card initialization failed");
+        return;  // Add this line to prevent task creation if SD init fails
     }
+
+    // Create image switching task only after SD card is initialized
+    xTaskCreate(image_switch_task,
+                "img_switch",
+                2048,
+                NULL,
+                2,
+                NULL);
 }

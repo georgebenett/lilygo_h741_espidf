@@ -93,7 +93,7 @@ static SemaphoreHandle_t lvgl_mux = NULL;
 esp_lcd_touch_handle_t tp = NULL;
 #endif
 
-#define EXAMPLE_LVGL_BUF_HEIGHT        (EXAMPLE_LCD_V_RES / 4)
+#define EXAMPLE_LVGL_BUF_HEIGHT        (EXAMPLE_LCD_V_RES / 2)
 #define EXAMPLE_LVGL_TICK_PERIOD_MS    2
 #define EXAMPLE_LVGL_TASK_MAX_DELAY_MS 500
 #define EXAMPLE_LVGL_TASK_MIN_DELAY_MS 1
@@ -280,10 +280,10 @@ static void image_switch_task(void *pvParameters) {
 
             // Create an image object
             img = lv_img_create(lv_scr_act());
-            
+
             // Set the image source
             lv_img_set_src(img, path);
-            
+
             // Center the image
             lv_obj_center(img);
 
@@ -300,7 +300,7 @@ static void image_switch_task(void *pvParameters) {
 static esp_err_t init_sd_card(void)
 {
     esp_err_t ret;
-    
+
     // Options for mounting the filesystem
     esp_vfs_fat_sdmmc_mount_config_t mount_config = {
         .format_if_mount_failed = false,
@@ -385,7 +385,7 @@ void app_main(void)
         .pin_bit_mask = 1ULL << EXAMPLE_PIN_NUM_LCD_EN
     };
     ESP_ERROR_CHECK(gpio_config(&lcd_en_gpio_config));
-    
+
     // Enable LCD by pulling GPIO high
     ESP_ERROR_CHECK(gpio_set_level(EXAMPLE_PIN_NUM_LCD_EN, 1));
 
@@ -473,12 +473,15 @@ void app_main(void)
     ESP_LOGI(TAG, "Initialize LVGL library");
     lv_init();
     lv_png_init();
-    // alloc draw buffers used by LVGL
-    // it's recommended to choose the size of the draw buffer(s) to be at least 1/10 screen sized
-    lv_color_t *buf1 = heap_caps_malloc(EXAMPLE_LCD_H_RES * EXAMPLE_LVGL_BUF_HEIGHT * sizeof(lv_color_t), MALLOC_CAP_DMA);
+
+    // Allocate the buffers in SPIRAM if available, otherwise in internal memory
+    lv_color_t *buf1 = heap_caps_malloc(EXAMPLE_LCD_H_RES * EXAMPLE_LVGL_BUF_HEIGHT * sizeof(lv_color_t),
+                                       MALLOC_CAP_DMA | MALLOC_CAP_SPIRAM);
     assert(buf1);
-    lv_color_t *buf2 = heap_caps_malloc(EXAMPLE_LCD_H_RES * EXAMPLE_LVGL_BUF_HEIGHT * sizeof(lv_color_t), MALLOC_CAP_DMA);
+    lv_color_t *buf2 = heap_caps_malloc(EXAMPLE_LCD_H_RES * EXAMPLE_LVGL_BUF_HEIGHT * sizeof(lv_color_t),
+                                       MALLOC_CAP_DMA | MALLOC_CAP_SPIRAM);
     assert(buf2);
+
     // initialize LVGL draw buffers
     lv_disp_draw_buf_init(&disp_buf, buf1, buf2, EXAMPLE_LCD_H_RES * EXAMPLE_LVGL_BUF_HEIGHT);
 

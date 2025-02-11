@@ -31,6 +31,7 @@
 #include "esp_err.h"
 #include "esp_log.h"
 #include "esp_heap_caps.h"
+#include "esp_sleep.h"
 
 #include "lvgl.h"
 #include "lv_demos.h"
@@ -47,12 +48,23 @@
 
 #include "lv_png.h"
 
-
 // Add this after the includes
 void ui_Screen1_screen_init(void);
 
 static const char *TAG = "example";
 static SemaphoreHandle_t lvgl_mux = NULL;
+
+// Add these new variables
+static int64_t button_press_start_time = 0;
+static bool button_pressed = false;
+#define DEEP_SLEEP_TRIGGER_TIME_US 3000000  // 3 seconds in microseconds
+
+#define RESET_DEBOUNCE_TIME_MS 2000
+#define INACTIVITY_TIMEOUT_MS (1000 * 60 * 5)  // 5 minutes
+
+// Forward declarations
+static void set_sleep_progress(void * obj, int32_t v);
+static void enter_deep_sleep(void);
 
 #define LCD_HOST    SPI2_HOST
 #define TOUCH_HOST  I2C_NUM_0
@@ -366,8 +378,117 @@ static esp_err_t init_sd_card(void)
     return ESP_OK;
 }
 
+static void IRAM_ATTR gpio_isr_handler(void* arg)
+{
+    uint64_t current_time = esp_timer_get_time();
+
+    int gpio_level = gpio_get_level(GPIO_NUM_0);
+
+    if (gpio_level == 0) {  // Button pressed
+        button_pressed = true;
+        button_press_start_time = current_time;
+    } else {  // Button released
+        button_pressed = false;
+    }
+}
+
+static void enter_deep_sleep(void)
+{
+    ESP_LOGI(TAG, "Entering deep sleep");
+
+    // Clean up before sleep
+    if (tp != NULL) {
+        esp_lcd_touch_enter_sleep(tp);
+    }
+
+    // Turn off LCD
+    gpio_set_level(EXAMPLE_PIN_NUM_LCD_EN, 0);
+
+    // Wait for button release to prevent immediate wake-up
+    while (gpio_get_level(GPIO_NUM_0) == 0) {
+        vTaskDelay(pdMS_TO_TICKS(10));
+    }
+
+    // Small delay to ensure button is fully released
+    vTaskDelay(pdMS_TO_TICKS(100));
+
+    // Configure wake-up source - wake up when button is pressed (GPIO goes LOW)
+    esp_sleep_enable_ext0_wakeup(GPIO_NUM_0, 0);
+
+    // Enter deep sleep
+    esp_deep_sleep_start();
+}
+
+static void button_check_task(void *pvParameters)
+{
+    bool sleep_triggered = false;
+
+    while (1) {
+        if (button_pressed && !sleep_triggered) {
+            int64_t current_time = esp_timer_get_time();
+            int64_t press_duration = current_time - button_press_start_time;
+
+            if (press_duration >= DEEP_SLEEP_TRIGGER_TIME_US) {
+                ESP_LOGI(TAG, "Button held for 3 seconds, waiting for release");
+                sleep_triggered = true;
+                enter_deep_sleep();
+            }
+        }
+        vTaskDelay(pdMS_TO_TICKS(100));
+    }
+}
+
+static void set_sleep_progress(void * obj, int32_t v)
+{
+    lv_bar_set_value(obj, v, LV_ANIM_OFF);
+
+    // If we reach 100%, trigger sleep immediately
+    if (v >= 100) {
+        ESP_LOGI(TAG, "Sleep animation complete, entering deep sleep");
+
+        // Clean up before sleep
+        if (tp != NULL) {
+            esp_lcd_touch_enter_sleep(tp);
+        }
+
+        // Turn off LCD
+        gpio_set_level(EXAMPLE_PIN_NUM_LCD_EN, 0);
+
+        // Configure wake-up source
+        esp_sleep_enable_ext0_wakeup(GPIO_NUM_0, 0);
+
+        // Enter deep sleep
+        esp_deep_sleep_start();
+    }
+}
+
+
 void app_main(void)
 {
+    // Configure GPIO0 as input with internal pull-up
+    gpio_config_t btn_config = {
+        .pin_bit_mask = (1ULL << GPIO_NUM_0),
+        .mode = GPIO_MODE_INPUT,
+        .pull_up_en = GPIO_PULLUP_ENABLE,
+        .pull_down_en = GPIO_PULLDOWN_DISABLE,
+        .intr_type = GPIO_INTR_NEGEDGE  // Changed to only detect falling edge
+    };
+    ESP_ERROR_CHECK(gpio_config(&btn_config));
+
+    // Install GPIO ISR service
+    ESP_ERROR_CHECK(gpio_install_isr_service(0));
+
+    // Add ISR handler
+    ESP_ERROR_CHECK(gpio_isr_handler_add(GPIO_NUM_0, gpio_isr_handler, NULL));
+
+    // Create button check task
+    xTaskCreate(button_check_task,
+                "button_check",
+                2048,
+                NULL,
+                1,
+                NULL);
+
     static lv_disp_draw_buf_t disp_buf; // contains internal graphic buffer(s) called draw buffer(s)
     static lv_disp_drv_t disp_drv;      // contains callback functions
 

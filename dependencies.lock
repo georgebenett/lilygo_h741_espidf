@@ -45,6 +45,12 @@ dependencies:
     source:
       type: idf
     version: 5.3.1
+  lv_lib_png:
+    dependencies: []
+    source:
+      path: /home/george/Documents/myrepo/lilygo_H741_esp-idf/components/lv_lib_png
+      type: local
+    version: '*'
   lvgl/lvgl:
     dependencies: []
     source:
@@ -58,7 +64,8 @@ direct_dependencies:
 - espressif/esp_lcd_touch_ft5x06
 - espressif/esp_lvgl_port
 - idf
+- lv_lib_png
 - lvgl/lvgl
-manifest_hash: 2466a1611ae2055077d5207038b5d7b092e9a3ea2b3e48bfd972cfe6f0d79323
+manifest_hash: 16132987948b7a8400ff960eb2415371d376d9d031fcea65be1e8cc9961df0e3
 target: esp32s3
 version: 2.0.0

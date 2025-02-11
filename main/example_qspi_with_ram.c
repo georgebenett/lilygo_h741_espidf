@@ -47,6 +47,7 @@
 
 #include "lv_png.h"
 
+
 // Add this after the includes
 void ui_Screen1_screen_init(void);
 

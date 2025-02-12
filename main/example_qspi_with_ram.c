@@ -303,7 +303,7 @@ static void image_switch_task(void *pvParameters) {
                 if (img != NULL) {
                     lv_img_set_src(img, path);
                     lv_obj_center(img);
-                    
+
                     // Move to next image
                     current_image++;
                 }
@@ -542,6 +542,10 @@ void app_main(void)
     ESP_ERROR_CHECK(esp_lcd_panel_disp_on_off(panel_handle, true));
 
 #if EXAMPLE_USE_TOUCH
+    // Suppress touch-related error messages
+    esp_log_level_set("lcd_panel.io.i2c", ESP_LOG_NONE);
+    esp_log_level_set("FT5x06", ESP_LOG_NONE);
+
     ESP_LOGI(TAG, "Initialize I2C bus");
     const i2c_config_t i2c_conf = {
         .mode = I2C_MODE_MASTER,

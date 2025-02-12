@@ -279,56 +279,51 @@ static void image_switch_task(void *pvParameters) {
     int current_image = 1;
     lv_obj_t *img = NULL;
     char path[32];
-
-    // Show first image immediately
-    if (example_lvgl_lock(-1)) {
-        snprintf(path, sizeof(path), "/sdcard/%d.png", current_image);
-        img = lv_img_create(lv_scr_act());
-        lv_img_set_src(img, path);
-        lv_obj_center(img);
-        example_lvgl_unlock();
-    }
-
-    // Wait a moment to ensure first image is displayed
-    vTaskDelay(pdMS_TO_TICKS(500));
-
-    current_image = 2;  // Start from second image in the loop
+    bool first_run = true;
 
     while (1) {
         if (example_lvgl_lock(-1)) {
-            // Create path string for next image
+            // Create path string for current image
             snprintf(path, sizeof(path), "/sdcard/%d.png", current_image);
 
             // Check if file exists
             FILE *f = fopen(path, "r");
             if (f != NULL) {
                 fclose(f);
+                ESP_LOGI(TAG, "Displaying image: %s", path);
 
                 // Delete previous image if it exists
                 if (img != NULL) {
                     lv_obj_del(img);
+                    img = NULL;
                 }
 
-                // Create an image object
+                // Create new image object
                 img = lv_img_create(lv_scr_act());
-
-                // Set the image source
-                lv_img_set_src(img, path);
-
-                // Center the image
-                lv_obj_center(img);
-
-                // Move to next image
-                current_image++;
+                if (img != NULL) {
+                    lv_img_set_src(img, path);
+                    lv_obj_center(img);
+                    
+                    // Move to next image
+                    current_image++;
+                }
             } else {
+                ESP_LOGI(TAG, "File not found: %s, resetting to first image", path);
                 // File doesn't exist, reset to first image
                 current_image = 1;
             }
 
             example_lvgl_unlock();
         }
-        // Wait for 10 seconds before showing next image
-        vTaskDelay(pdMS_TO_TICKS(20000));
+
+        // If this is the first run, use a shorter delay
+        if (first_run) {
+            vTaskDelay(pdMS_TO_TICKS(500));
+            first_run = false;
+        } else {
+            // Wait for 20 seconds before showing next image
+            vTaskDelay(pdMS_TO_TICKS(20000));
+        }
     }
 }
 
@@ -671,9 +666,9 @@ void app_main(void)
 
     // Create image switching task only after SD card is initialized
     xTaskCreate(image_switch_task,
-                "img_switch",
-                2048,
+                "image_switch",
+                4096,  // Increase stack size to 4KB
                 NULL,
-                2,
+                2,     // Priority
                 NULL);
 }

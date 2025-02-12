@@ -328,7 +328,7 @@ static void image_switch_task(void *pvParameters) {
             example_lvgl_unlock();
         }
         // Wait for 10 seconds before showing next image
-        vTaskDelay(pdMS_TO_TICKS(10000));
+        vTaskDelay(pdMS_TO_TICKS(20000));
     }
 }
 
@@ -459,8 +459,6 @@ static void button_check_task(void *pvParameters)
         vTaskDelay(pdMS_TO_TICKS(100));
     }
 }
-
-
 
 void app_main(void)
 {
@@ -645,16 +643,8 @@ void app_main(void)
     ESP_LOGI(TAG, "Display LVGL demos");
     // Lock the mutex due to the LVGL APIs are not thread-safe
     if (example_lvgl_lock(-1)) {
-
         // Call the screen initialization function
         ui_init();
-        xTaskCreate(image_switch_task,
-                    "img_switch",
-                    2048,        // Stack size
-                    NULL,        // Task parameters
-                    2,          // Priority
-                    NULL);      // Task handle
-        // Release the mutex
         example_lvgl_unlock();
     }
 
@@ -662,18 +652,18 @@ void app_main(void)
     esp_err_t ret = init_sd_card();
     if (ret != ESP_OK) {
         ESP_LOGE(TAG, "SD Card initialization failed");
-        
+
         // Lock LVGL and create error message
         if (example_lvgl_lock(-1)) {
             // Create a black background
             lv_obj_set_style_bg_color(lv_scr_act(), lv_color_black(), LV_PART_MAIN);
-            
+
             // Create label for error message
             lv_obj_t * label = lv_label_create(lv_scr_act());
-            lv_label_set_text(label, "Insira o cartao SD meu amor!");
-            lv_obj_set_style_text_color(label, lv_color_make(255, 0, 0), LV_PART_MAIN);  // Red text
+            lv_label_set_text(label, "Insira o cartao SD e reinicie o sistema meu AMOR! S2");
+            lv_obj_set_style_text_color(label, lv_color_make(255, 0, 0), LV_PART_MAIN);
             lv_obj_center(label);
-            
+
             example_lvgl_unlock();
         }
         return;  // Return without creating image switch task

@@ -660,7 +660,7 @@ void app_main(void)
 
             // Create label for error message
             lv_obj_t * label = lv_label_create(lv_scr_act());
-            lv_label_set_text(label, "Insira o cartao SD e reinicie o sistema meu AMOR! S2");
+            lv_label_set_text(label, "Failed to initialize SD card");
             lv_obj_set_style_text_color(label, lv_color_make(255, 0, 0), LV_PART_MAIN);
             lv_obj_center(label);
 

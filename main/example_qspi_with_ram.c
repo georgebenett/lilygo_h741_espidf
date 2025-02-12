@@ -662,7 +662,21 @@ void app_main(void)
     esp_err_t ret = init_sd_card();
     if (ret != ESP_OK) {
         ESP_LOGE(TAG, "SD Card initialization failed");
-        return;  // Add this line to prevent task creation if SD init fails
+        
+        // Lock LVGL and create error message
+        if (example_lvgl_lock(-1)) {
+            // Create a black background
+            lv_obj_set_style_bg_color(lv_scr_act(), lv_color_black(), LV_PART_MAIN);
+            
+            // Create label for error message
+            lv_obj_t * label = lv_label_create(lv_scr_act());
+            lv_label_set_text(label, "Insira o cartao SD meu amor!");
+            lv_obj_set_style_text_color(label, lv_color_make(255, 0, 0), LV_PART_MAIN);  // Red text
+            lv_obj_center(label);
+            
+            example_lvgl_unlock();
+        }
+        return;  // Return without creating image switch task
     }
 
     // Create image switching task only after SD card is initialized

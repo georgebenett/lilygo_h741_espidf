@@ -18,17 +18,10 @@ extern "C" {
 // SCREEN: ui_Screen1
 void ui_Screen1_screen_init(void);
 extern lv_obj_t * ui_Screen1;
-extern lv_obj_t * ui_Image1;
-extern lv_obj_t * ui_Image2;
-extern lv_obj_t * ui_Image3;
-extern lv_obj_t * ui_Image4;
-
 // CUSTOM VARIABLES
 
 // EVENTS
 extern lv_obj_t * ui____initial_actions0;
-
-
 
 // UI INIT
 void ui_init(void);

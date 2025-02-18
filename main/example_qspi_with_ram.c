@@ -112,6 +112,8 @@ esp_lcd_touch_handle_t tp = NULL;
 #define EXAMPLE_LVGL_TASK_STACK_SIZE   (4 * 1024)
 #define EXAMPLE_LVGL_TASK_PRIORITY     2
 
+#define OPTIMAL_BUF_HEIGHT (EXAMPLE_LCD_V_RES * 0.2)  // 20% of screen height
+
 static const sh8601_lcd_init_cmd_t lcd_init_cmds[] = {
  //1.43 inch AMOLED from DWO LIMITED
 //Part number: DO0143FMST02-QSPI  / DO0143PFST03-QSPI  / DO0143FMST05-QSPI  / DO0143FMST06-QSPI
@@ -592,11 +594,11 @@ void app_main(void)
     lv_init();
     lv_png_init();
 
-    // Allocate the buffers in SPIRAM if available, otherwise in internal memory
-    lv_color_t *buf1 = heap_caps_malloc(EXAMPLE_LCD_H_RES * EXAMPLE_LVGL_BUF_HEIGHT * sizeof(lv_color_t),
+    // Allocate buffers with optimal size
+    lv_color_t *buf1 = heap_caps_malloc(EXAMPLE_LCD_H_RES * OPTIMAL_BUF_HEIGHT * sizeof(lv_color_t),
                                        MALLOC_CAP_DMA | MALLOC_CAP_SPIRAM);
     assert(buf1);
-    lv_color_t *buf2 = heap_caps_malloc(EXAMPLE_LCD_H_RES * EXAMPLE_LVGL_BUF_HEIGHT * sizeof(lv_color_t),
+    lv_color_t *buf2 = heap_caps_malloc(EXAMPLE_LCD_H_RES * OPTIMAL_BUF_HEIGHT * sizeof(lv_color_t),
                                        MALLOC_CAP_DMA | MALLOC_CAP_SPIRAM);
     assert(buf2);
 

@@ -10,6 +10,11 @@ This project provides ESP-IDF implementation for the LILYGO T-Display S3 AMOLED 
 - Micro SD Card
 - USB-C cable for programming
 
+## Mechanical Files
+
+The 3D printable case files for this project can be found on Thingiverse:
+[T-Display S3 AMOLED Case Files](https://www.thingiverse.com/thing:6953585)
+
 ## Display Specifications
 
 - Resolution: 466 x 466 pixels

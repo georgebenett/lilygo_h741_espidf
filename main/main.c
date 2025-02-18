@@ -1,21 +1,3 @@
-/*
- * SPDX-FileCopyrightText: 2023 Espressif Systems (Shanghai) CO LTD
- *
- * SPDX-License-Identifier: CC0-1.0
- * 20240329
- * 1.43 inch AMOLED from DWO LIMITED
- * Part number: DO0143FMST02-QSPI  / DO0143PFST03-QSPI  / DO0143FMST05-QSPI  / DO0143FMST06-QSPI
- * Size: 1.43 inch
- * Resolution: 466x466
- * Signal interface:  QSPI
- * DWO LIMITED
- * AMOLED screen customization.
- * www.dwo.net.cn
- * alan@dwo.net.cn
- * Tel: 86-755-82580810
- * handheld devices, industrial equipment, smart instruments, outdoor displays, smart homes.
- */
-
 #include <stdio.h>
 #include <dirent.h>
 

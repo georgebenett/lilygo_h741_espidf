@@ -1,9 +1,4 @@
-/*
- * @Description: None
- * @Author: LILYGO_L
- * @Date: 2023-06-05 13:01:59
- * @LastEditTime: 2025-01-23 15:07:46
- */
+
 #pragma once
 
 //这里选择你使用的屏幕

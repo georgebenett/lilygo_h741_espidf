@@ -35,7 +35,7 @@ This project provides ESP-IDF implementation for the LILYGO T-Display S3 AMOLED 
 
 1. Clone this repository:
 ```bash
-git clone [your-repository-url]
+git clone [https://github.com/georgebenett/lilygo_h741_espidf.git]
 ```
 
 2. Navigate to the project directory:

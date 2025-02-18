@@ -3,7 +3,7 @@ file(GLOB_RECURSE UI_SOURCES
 )
 
 idf_component_register(
-    SRCS "example_qspi_with_ram.c"
+    SRCS "main.c"
     ${UI_SOURCES}
     INCLUDE_DIRS "."
     "ui"
